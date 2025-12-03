@@ -1494,6 +1494,9 @@ function build_report_conditions_sql($parameters) {
 									if ($col_type == DATA_TYPE_DATETIME || $col_type == DATA_TYPE_DATE) {
 										$equal = 'datediff('.DB::escape($value).', `'.$field_name.'`)=0';
 									} else {
+										if ($col_type == DATA_TYPE_BOOLEAN && $value == '-1') {
+											$value = '0';
+										}
 										$equal = '`'.$field_name.'` '.$condField->getCondition().' '.DB::escape($value);
 									}
 									switch($condField->getCondition()){

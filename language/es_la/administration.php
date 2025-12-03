@@ -674,5 +674,21 @@
 	'user' => 'Usuario',
 	'config option name default_type_address' => 'Tipo de dirección predeterminado',
 	'config option desc default_type_address' => 'Selecciona la opción predeterminada dentro del tipo de dirección',
+	'config option name contact_quickadd_inputs' => 'Propiedades del formulario de alta rápida de contactos',
+	'config option desc contact_quickadd_inputs' => 'Seleccione las propiedades que se mostrarán en el formulario de alta rápida de contactos.',
+
+	'config option name show_inactive_users_on_filters' => 'Mostrar usuarios inactivos en filtros',
+	'config option desc show_inactive_users_on_filters' => 'Si se habilita, los usuarios inactivos serán mostrados en los filtros de usuarios.',
+
+	'config option name contact_quickadd_view_info' => 'Información a mostrar al seleccionar contacto',
+	'config option desc contact_quickadd_view_info' => 'Seleccione la información del contacto que se mostrará después de seleccionar un contacto en otro formulario (por ejemplo: formularios de Proyectos y Clientes)',
+
+
+	'user config option name ask_reclassify_behavior' => 'Preguntar al reclasificar',
+	'user config option desc ask_reclassify_behavior' => '¿Qué hacer con los objetos clasificados al cambiar la asociación entre miembros de dimensiones? Por ejemplo: al cambiar la Lista de Precios de un proyecto, también cambiarla para todos los Tiempos, Gastos, Tareas y otros objetos clasificados bajo ese proyecto.',
+	'config_ask' => 'Preguntar',
+	'config_always' => 'Reclasificar siempre',
+	'config_never' => 'Nunca reclasificar',
+
 
 ); ?>

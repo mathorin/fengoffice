@@ -694,7 +694,7 @@ Ext.extend(og.MemberTree, Ext.tree.TreePanel, {
 		    				
 		    				//get the text from the filter
 		    				var search_text = dimension_tree.getTopToolbar().items.get(dimension_tree.id + '-textfilter').el.getValue();
-		    				re_search_text = new RegExp(Ext.escapeRe(search_text.toLowerCase()), 'i');
+		    				var re_search_text = new RegExp(Ext.escapeRe(search_text.toLowerCase()), 'i');
 		    				
 		    				//add the last search criteria to the search history
 		    				if(data.query && data.query.trim() != ''){
@@ -704,10 +704,39 @@ Ext.extend(og.MemberTree, Ext.tree.TreePanel, {
 		    					dimension_tree.tbar.history.prevTextFilters.push(data.query);
 							}
 
-		    				//filter the tree
-		    				dimension_tree.filterNode(dimension_tree.getRootNode(), re_search_text);
+							// store the dimension tree and the search text in a global variable so it can be used globally
+							og.dim_tree_to_filter = {
+								tree: dimension_tree,
+								re_search_text: re_search_text
+							}
+							// first try to filter the tree with current loaded data
+							dimension_tree.filterNode(dimension_tree.getRootNode(), re_search_text);
+							
+							// filter the tree: suspend events, expand all and filter, resume events
+							// suspend events
 		    				dimension_tree.suspendEvents();
-		    				dimension_tree.expandAll();
+							// do the filter in the callback called after the whole tree is expanded
+		    				dimension_tree.expandAll(function() {
+								if (!og.dim_tree_to_filter) return;
+								// give some time to the js to finish render and then call the filterNode function
+								setTimeout(function(){
+									if (!og.dim_tree_to_filter) return;
+
+									// get the global variables to use
+									let current_tree = og.dim_tree_to_filter.tree;
+									let reg_exp = og.dim_tree_to_filter.re_search_text;
+									
+									// do the filter
+									if (current_tree && reg_exp) {
+										current_tree.filterNode(current_tree.getRootNode(), reg_exp);
+									}
+									
+									// clear the global variable
+									og.dim_tree_to_filter = null;
+								}, 100);
+							
+							});
+							// resume events
 		    				dimension_tree.resumeEvents();
 	    				}				
 	    			}

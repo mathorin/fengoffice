@@ -177,7 +177,7 @@ function intersectCSVs($csv1, $csv2){
 	return implode(',', $final);
 }
 
-function allowed_users_to_assign($context = null, $filter_by_permissions = true, $return_company_array = true, $for_task_list_filters=false, $object_type_id = null) {
+function allowed_users_to_assign($context = null, $filter_by_permissions = true, $return_company_array = true, $for_task_list_filters=false, $object_type_id = null, $include_inactive = false) {
 	if ($context == null) {
 		$context = active_context();
 	}
@@ -201,7 +201,7 @@ function allowed_users_to_assign($context = null, $filter_by_permissions = true,
 			}
 			//get users with can_task_assignee permissions
 			if($root_context && $for_task_list_filters){
-				$tmp_contacts = get_users_with_system_permission('can_task_assignee');
+				$tmp_contacts = get_users_with_system_permission('can_task_assignee', $include_inactive);
 			}else{
                 $for_template_task_assigned_to = array_var($_GET, 'for_template_task_assigned_to');
 
@@ -1681,72 +1681,6 @@ function build_member_display_name($member) {
 	}
 	
 	
-	function append_other_properties_search_conditions(Dimension $dimension, $query_string, &$search_name_cond) {
-
-		$option_values = DimensionObjectTypeOptions::getOptionValuesForAllObjectTypes($dimension->getId(), 'text_to_show_in_trees');
-	
-		if (is_array($option_values) && count($option_values) > 0) {
-
-			$conditions = array();
-			
-			foreach ($option_values as $option_value) {
-				/* @var $option_value DimensionObjectTypeOption */
-				$raw_val = $option_value->getValue();
-
-				if (trim($raw_val) != "") {
-					$option_decoded = json_decode($raw_val, true);
-
-					if (isset($option_decoded['properties']) && count($option_decoded['properties']) > 0) { 
-
-						foreach ($option_decoded['properties'] as $col) {
-							if (Members::instance()->columnExists($col)) {
-								$conditions[] = "$col LIKE '%".$query_string."%'";
-						
-							} else if (str_starts_with($col, "cp_")) {
-								$cp_id = str_replace("cp_", "", $col);
-								$ot = ObjectTypes::instance()->findById($option_value->getObjectTypeId());
-						
-								if ($ot->getType() == 'dimension_object') {
-									$conditions[] = "EXISTS (
-										SELECT `value` FROM ".TABLE_PREFIX."custom_property_values cpv
-										WHERE cpv.custom_property_id='$cp_id' AND `value` LIKE '%".$query_string."%'
-										AND cpv.object_id=".TABLE_PREFIX."members.object_id
-									)
-									";
-								} else {
-									if (Plugins::instance()->isActivePlugin('member_custom_properties')) {
-										$conditions[] = "EXISTS (
-											SELECT `value` FROM ".TABLE_PREFIX."member_custom_property_values cpv
-											WHERE cpv.custom_property_id='$cp_id' AND `value` LIKE '%".$query_string."%'
-											AND cpv.member_id=".TABLE_PREFIX."members.id
-										)
-										";
-									}
-								}
-							}
-							else if (str_starts_with($col, "assoc_")) {
-
-								$assoc_id = str_replace("assoc_", "", $col);
-								
-								$conditions[] = " EXISTS (
-									SELECT fm.name, fmpm.property_member_id 
-									FROM ".TABLE_PREFIX."members fm 
-									INNER JOIN ".TABLE_PREFIX."member_property_members fmpm ON fmpm.association_id = '$assoc_id'
-									WHERE fm.name LIKE '%".$query_string."%'
-										and ".TABLE_PREFIX."members.id = fmpm.member_id
-              							and fm.id = fmpm.property_member_id
-								) ";
-							}
-						}
-						
-						if (count($conditions) > 0) {
-							$search_name_cond = " AND (" . implode(" OR ", $conditions) . ")";
-						}
-					}
-				}
-			}
-		}
-	}
 
 
 	function render_single_dimension_tree($dimension, $genid = null, $selected_members = array(), $options = array()) {
@@ -1813,6 +1747,10 @@ function build_member_display_name($member) {
 				width: <?php echo array_var($options, 'width', '385') ?>,
 				listeners: {'tree rendered': function (t) {if (select_root) t.root.select();}}
 			};
+
+			<?php if( isset ($options['extra_options'])) : ?>
+				config.extra_options = <?php echo json_encode($options['extra_options']) ?>;
+			<?php endif; ?>
 			
 			<?php if( isset ($options['get_childs_params'])) : ?>
 				config.get_childs_params = <?php echo json_encode($options['get_childs_params']) ?>;
@@ -2392,4 +2330,9 @@ function log_time_diff($message, $decimals = 5) {
 	Logger::log("TIMEDIFF $message - $time_diff");
 
 	$_REQUEST['log_time_diff_last_time'] = $now;
+}
+
+
+function safe_count($array, $key) {
+	return isset($array[$key]) && is_array($array[$key]) ? count($array[$key]) : 0;
 }

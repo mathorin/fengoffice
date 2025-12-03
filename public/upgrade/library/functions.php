@@ -116,6 +116,16 @@ function installed_version() {
 } // installed_version
 
 /**
+ * Return the version of the current code
+ *
+ * @param void
+ * @return string
+ */
+function code_version() {
+	return @include ROOT . '/version.php';
+}
+
+/**
  * Deletes a directory and all of its contents
  * 
  */

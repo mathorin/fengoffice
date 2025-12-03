@@ -174,7 +174,7 @@ class ReportingController extends ApplicationController {
 			// if time list filters are sent then initialize the report filters with those values
 
 			$report_data['user'] = array_var($report_params, 'user');
-			$report_data['timeslot_type'] = array_var($report_params, 'timeslot_type');
+			$report_data['timeslot_type'] = array_var($report_params, 'timeslot_type') < 3 ? array_var($report_params, 'timeslot_type') : 0; // 0 = all, 1 = task time, 2 = general time
 			$report_data['date_type'] = array_var($report_params, 'date_type');
 
 			$st = getDateValue(array_var($report_params, 'start_value'));

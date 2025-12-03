@@ -687,10 +687,12 @@ class Member extends BaseMember {
 				return parent::setParentMemberId($value);
 			}else{
 				//error
-				Logger::log("Not valid parent member type '$parent_type'," . $this->getObjectTypeId());			
-				$errors = array() ;
-				$errors[] = "Not valid parent member type";
+				Logger::log("Not valid parent member type '$parent_type'," . $this->getObjectTypeId());
+				$errors = array();
+				$object_type_name = ObjectTypes::instance()->findById($this->getObjectTypeId())->getObjectTypeName();	
+				$errors[] = lang("not valid parent member type", $parent->getTypeNameToShow(), $parent->getDisplayName(), $object_type_name);
 				throw new DAOValidationError($this, $errors);
+				
 			}
 		} else {
 			return parent::setParentMemberId(0);

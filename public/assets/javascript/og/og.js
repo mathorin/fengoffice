@@ -3150,15 +3150,18 @@ og.center_modal_form = function() {
 }
 
 og.update_modal_main_input_width = function() {
-	var title_w = $(".simplemodal-data .coInputHeader .coInputHeaderUpperRow .coInputTitle").width();
-	var buttons_w = $(".simplemodal-data .coInputHeader .coInputButtons").width();
-	var prefix_w = $(".simplemodal-data .coInputHeader .coInputName .object-prefix").width();
-	var total_w = $(".simplemodal-data .coInputHeader").width();
-
-	var input_count = $(".simplemodal-data .coInputHeader .coInputName input.title").length;
-	if (input_count < 1) input_count = 1;
-
-	$(".simplemodal-data .coInputHeader .coInputName input.title").css('width', (((total_w - title_w - buttons_w - prefix_w) / input_count) - 35) + 'px');
+	// use a small timout to let the form process the css first
+	setTimeout(function() {
+		var title_w = $(".simplemodal-data .coInputHeader .coInputHeaderUpperRow .coInputTitle").width();
+		var buttons_w = $(".simplemodal-data .coInputHeader .coInputButtons").width();
+		var prefix_w = $(".simplemodal-data .coInputHeader .coInputName .object-prefix").width();
+		var total_w = $(".simplemodal-data .coInputHeader").width();
+	
+		var input_count = $(".simplemodal-data .coInputHeader .coInputName input.title").length;
+		if (input_count < 1) input_count = 1;
+	
+		$(".simplemodal-data .coInputHeader .coInputName input.title").css('width', (((total_w - title_w - buttons_w - prefix_w) / input_count) - 35) + 'px');
+	}, 100);
 }
 
 /**
@@ -4083,6 +4086,20 @@ og.memberTreeAjaxLoad = function(tree, pnode, limit, offset, add_params) {
 			dimension_tree.initialized = true;
 		}
 	});
+}
+
+/**
+ * Return the extra filters for the tree as a JSON string
+ * @param tree {og.MemberTreeAjax} The tree to get the filters from
+ * @return {String} The extra filters as a JSON string
+ */
+og.getMemberTreeExtraFilters = function(tree) {
+	if (tree.initialConfig.extra_options && tree.initialConfig.extra_options.filters && tree.initialConfig.extra_options.filters.length > 0) {
+		// Return the filters as a JSON string
+		return JSON.stringify(tree.initialConfig.extra_options.filters);
+	} else {
+		return null;
+	}
 }
 
 og.reloadCurrentPanel = function() {
@@ -5504,7 +5521,7 @@ og.upload_tmp_file_content = function(genid, file_input_id, file_input_name, hf_
 
 // drag & drop classification call
 
-og.call_add_objects_to_member = function(e, ids, member_id, attachment, reclassify_in_associations, remove_prev, callback, dimension_id) {
+og.call_add_objects_to_member = function(e, ids, member_id, attachment, reclassify_in_associations, remove_prev, callback, dimension_id, remove_obj_task) {
 	
 	if (og.still_adding_objects_to_member) return;
 	og.still_adding_objects_to_member = true;
@@ -5525,6 +5542,7 @@ og.call_add_objects_to_member = function(e, ids, member_id, attachment, reclassi
 	if (attachment) params.attachment = attachment;
 	if (reclassify_in_associations) params.reclassify_in_associations = reclassify_in_associations;
 	if (remove_prev) params.remove_prev = remove_prev;
+	if (remove_obj_task) params.remove_obj_task = remove_obj_task;
 	
 	params.req_channel = 'drag and drop';
 	
@@ -5599,6 +5617,10 @@ og.format_money_amount = function(amount, decimals) {
 
 	// get the number
 	amount = parseFloat(amount);
+
+	if (isNaN(amount)) {
+		amount = 0;
+	}
 	
 	if (!decimals) {
 		decimals = og.preferences.decimal_digits == '' ? 2 : og.preferences.decimal_digits;
@@ -6183,6 +6205,113 @@ og.showMailRuleModal = function (content) {
 		});
 	}, 100);
 	}
+
+og.showConfirmationModal = function(options) {
+    const config = {
+        title: 'Confirm Action',
+        message: 'Are you sure?',
+        yesText: 'Yes',
+        noText: 'No',
+        onConfirm: function(){},
+        onCancel: function(){},
+        ...options
+    };
+
+    const modalId = 'confirmation-modal-' + Math.random().toString(36).substr(2, 9);
+
+    const html = `
+        <div id="${modalId}" class="confirmation-modal">
+            <div class="confirmation-modal-title">${config.title}</div>
+            <p class="confirmation-modal-message">${config.message}</p>
+            <div class="confirmation-modal-buttons">
+                <button id="${modalId}-cancel" class="confirmation-modal-btn cancel">${config.noText}</button>
+                <button id="${modalId}-confirm" class="confirmation-modal-btn confirm">${config.yesText}</button>
+            </div>
+        </div>
+    `;
+
+    const $modal = $(html).appendTo('body').modal({
+        closeExisting: false,
+        escapeClose: true,
+        clickClose: false,
+        fadeDuration: 200
+    });
+
+    $(`#${modalId}-confirm`).click(function() {
+        $.modal.close();
+        config.onConfirm();
+    });
+
+    $(`#${modalId}-cancel`).click(function() {
+        $.modal.close();
+        config.onCancel();
+    });
+
+    // Hover effects
+    $(`#${modalId}-cancel`).hover(
+        function() { $(this).addClass('hover'); },
+        function() { $(this).removeClass('hover'); }
+    );
+
+    $(`#${modalId}-confirm`).hover(
+        function() { $(this).addClass('hover'); },
+        function() { $(this).removeClass('hover'); }
+    );
+};
+
+og.showConfirmationModalOLD = function(options) {
+    const config = {
+        title: 'Confirm',
+        message: 'Are you sure?',
+        yesText: 'Yes',
+        noText: 'No',
+        onConfirm: function () {},
+        onCancel: function () {},
+        ...options
+    };
+
+    const modalId = 'confirmation-modal-' + Math.random().toString(36).substr(2, 9);
+
+    const html = `
+        <div class="confirmation-modal-old">
+            <div><label class="coInputTitle">${config.title}</label></div><br />
+            <div id="${modalId}_question">${config.message}</div>
+            <div id="${modalId}_buttons" class="confirmation-modal-old-buttons">
+                <button class="yes submit blue">${config.yesText}</button>
+                <button class="no submit blue">${config.noText}</button>
+            </div>
+            <div class="clear"></div>
+        </div>
+    `;
+
+    const div = document.createElement('div');
+    div.innerHTML = html;
+
+    const modal_params = {
+        escClose: true,
+        overlayClose: true,
+        closeHTML: `<a id="${modalId}_close_link" class="modal-close" title="close"></a>`,
+        onShow: function (dialog) {
+            $(`#${modalId}_close_link`).addClass("modal-close-img");
+
+            $(`#${modalId}_buttons .yes`).click(function () {
+                $.modal.close();
+                config.onConfirm();
+            });
+
+            $(`#${modalId}_buttons .no`).click(function () {
+                $.modal.close();
+                config.onCancel();
+            });
+        }
+    };
+
+    setTimeout(function () {
+        $.modal(div, modal_params);
+    }, 100);
+};
+
+
 
 
 	og.initCustomNameSelects = function(count) {

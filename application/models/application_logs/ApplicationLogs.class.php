@@ -381,7 +381,8 @@ class ApplicationLogs extends BaseApplicationLogs {
 		$share_table_join = "";
 		$permissions_condition = 'true';
 		if(!logged_user()->isAdministrator()){
-			$share_table_join = " INNER JOIN ".TABLE_PREFIX."sharing_table sh ON al.rel_object_id = sh.object_id";
+			// force to use the index by object_id to avoid performance issues.
+			$share_table_join = " INNER JOIN ".TABLE_PREFIX."sharing_table sh USE INDEX (object_id) ON al.rel_object_id = sh.object_id";
 			$permissions_condition = "sh.group_id  IN ($logged_user_pgs) ";
 		}
 
