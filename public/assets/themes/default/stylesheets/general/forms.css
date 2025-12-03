@@ -779,17 +779,23 @@ a.cke_combo_button, a.cke_button {
 	box-sizing: border-box;
 }
 
-.amount-container-fields select {
+.custom-properties .input-container .amount-container-fields select {
 	/* margin-bottom: 5px; */
 	margin-right: 5px;
-	width: 60px;
-	height: 30px;
+	width: 60px !important;
+	height: 30px !important;
+	display: inline-block !important;
 }
-.amount-container-fields input {
+.custom-properties .input-container .amount-container-fields input {
 	width: 287px;
 	box-sizing: border-box;
 	text-align: right;
 	height: 30px;
+}
+
+.custom-properties .input-container .amount-container-fields input[type="text"]:not(.x-form-text) {
+	width: 287px;
+	display: inline-block;
 }
 
 .cp-url {
@@ -828,3 +834,144 @@ a.cke_combo_button, a.cke_button {
 	/* padding-left: 170px; */
 	padding-top: 5px;
 }
+
+
+
+/* Contact quick add */
+.contact-quick-add .cp-text {
+	width: 342px;
+}
+.contact-quick-add .address-custom-properties-parent .address-input-container {
+	grid-template-rows: repeat(3, 1fr);
+}
+.contact-quick-add .address-custom-properties-parent .address-input-container .address_street_input,
+.contact-quick-add .address-custom-properties-parent .address-input-container .address_city_input,
+.contact-quick-add .address-custom-properties-parent .address-input-container .address_state_input {
+	width: 164px;
+}
+.contact-quick-add .address-custom-properties-parent .address-input-container .address_country_input {
+	width: 172px;
+}
+.contact-quick-add .button-container {
+	float: right;
+	margin-right: 25px;
+	margin-bottom: 10px;
+}
+
+
+.form-container.project {
+	width: 900px;
+}
+
+.form-container.customer {
+	width: 1000px;
+}
+
+
+.form-container.customer .dimension-selector-container {
+    display: block !important;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.form-container.customer .dimension-selector-container > label {
+    display: block !important;
+    margin-bottom: 6px !important;
+    font-size: 100%;
+}
+
+.form-container.customer .dimension-selector-container > .input-container {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+}
+
+.form-container.customer .input-container label,
+.form-container.customer .dimension-selector-container > label {
+    display: block !important;
+    float: none !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.form-container.customer .address-custom-properties-parent .address-input-container {
+    margin-top: 5px !important;
+}
+
+.form-container.customer .address-custom-properties-parent .address-input-container .address_city_input {
+    width: 293px;
+    height: 25px;
+    margin-top: 5px;
+}
+
+.form-container.customer .address-custom-properties-parent .address-input-container {
+    max-width: 329px !important;
+    justify-content: space-between;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    position: relative;
+}
+
+.form-container.customer .address-custom-properties-parent .address-input-container .coViewAction {
+    display: none;
+}
+
+.form-container.customer .address-custom-properties-parent .address-input-container > span select, 
+.form-container.customer .phone-input-container > span select,
+.form-container.customer .phones-input-container > span select,
+.form-container.customer .emails-input-container span select,
+.form-container.customer .webpages-input-container span select {
+    width: 73px !important;
+    height: 32px !important;
+}
+
+.form-container.customer .phone-input-container input,
+.form-container.customer .emails-input-container input,
+.form-container.customer .webpages-input-container input {
+    height: 24px;
+    margin-left: 7px;
+}
+
+.form-container.customer .address-custom-properties-parent .address-input-container textarea {
+    width: 293px;
+    height: 65px;
+    margin-top: 5px;
+}
+
+.form-container.customer .address-custom-properties-parent .address-input-container .address_city_input {
+    width: 293px;
+    height: 25px;
+    margin-top: 5px;
+}
+
+.form-container.customer .address-custom-properties-parent .address-input-container .address_state_input {
+    width: 139px;
+    height: 25px;
+    margin-top: 5px;
+}
+
+.customer .address-custom-properties-parent .address-input-container {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.customer .address-custom-properties-parent .address-input-container .address_zipcode_input {
+    height: 25px;
+    width: 139px;
+    margin-top: 5px;
+    margin-right: 28px;
+}
+
+.form-container.customer .address-custom-properties-parent .address-input-container .address_country_input {
+    height: 33px;
+    width: 301px;
+    margin-top: 5px;
+}
+
+.form-container.customer .address_type_input {
+    min-width: 140px !important;
+}
+
+

@@ -1076,7 +1076,7 @@ class MailController extends ApplicationController {
 						// actions are taken below depending on the sentOK variable
 						Logger::log("Could not send email: ".$e->getMessage()."\nmail_id=".$mail->getId());
 						if (strpos($e->getMessage(), '552') !== false) {
-							flash_error(lang("Error: The email size exceeds the server's allowed limit."));
+							flash_error(lang("Error: The email size exceeds the servers allowed limit."));
 						}
 						$sentOK = false;
 					}

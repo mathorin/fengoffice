@@ -1051,4 +1051,5 @@ addLangs({
     'paid' : 'Paid',
     'individual contacts' : 'Individual contacts',
 	'individual contact' : 'Individual contact',
+	'proceed' : 'Proceed',
 });

@@ -922,6 +922,9 @@ function get_format_value_to_header($col, $obj_type_id)
 		$thousand_separator = user_config_option('thousand_separator');
 		
 		$sign = "";
+		if ($number == '') {
+			$number = 0;
+		}
 		if ($number < 0) {
 			$sign = "- ";
 		}
