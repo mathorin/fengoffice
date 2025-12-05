@@ -1062,7 +1062,8 @@ abstract class ContentDataObjects extends DataManager {
     
     
     static function prepareTrashAndArchivedConditions($trashed, $archived){
-        $trashed_cond = "`o`.`trashed_on` " .($trashed ? ">" : "="). " 0";
+        // USE trashed_by_id INSTEAD OF trashed_on TO IMPROVE PERFORMANCE OF THE QUERY
+        $trashed_cond = "`o`.`trashed_by_id` " .($trashed ? ">" : "="). " 0";
     	if ($trashed) {
     		$archived_cond = "";
     	} else {
@@ -1483,12 +1484,62 @@ abstract class ContentDataObjects extends DataManager {
 		return array();
 	}
 	
+	/**
+	 * Retrieves associated objects' columns which are fixed, i.e. defined by the
+	 * associated object type's columns.
+	 *
+	 * @return array An array of associated objects' columns with their details.
+	 */
 	function getAssociatedObjectsFixedColumns() {
-		return array();
+		$properties = array();
+
+		// Get associated contact properties if the member type has an associated contact
+		$properties = array_merge($properties, $this->getAssociatedContactProperties());
+
+		return $properties;
 	}
 	
 	function getAssociatedObjectManagers() {
 		return array();
+	}
+
+
+	/**
+	 * Retrieves associated contact properties for the current object type.
+	 *
+	 * @return array An array of associated contact properties with their details.
+	 */
+	function getAssociatedContactProperties() {
+		$columns = array();
+
+		// Get associated contact properties if the it is a member type and has an associated contact
+		if ($this->isMemberTypeWithContact()) {
+			$columns['contact_id'] = array(
+				array('col' => 'email', 'external' => true, 'type' => 'email', 'label' => lang("email")),
+				array('col' => 'phone', 'external' => true, 'type' => 'phone', 'label' => lang("phone")),
+				array('col' => 'address', 'external' => true, 'type' => 'address', 'label' => lang("address")),
+				array('col' => 'webpage', 'external' => true, 'type' => 'webpage', 'label' => lang("webpage")),
+				array('col' => 'picture_file', 'external' => true, 'type' => 'image', 'label' => lang("picture")),
+				array('col' => 'comments', 'type' => DATA_TYPE_STRING, 'label' => lang("notes"), 'large' => true),
+				array('col' => 'company_id', 'type' => 'company', 'label' => lang("company")),
+				array('col' => 'birthday', 'type' => DATA_TYPE_DATE, 'label' => lang("birthday")),
+				array('col' => 'department', 'type' => DATA_TYPE_STRING, 'label' => lang("department")),
+			);
+		}
+		return $columns;
+	}
+
+	/**
+	 * Checks if the current object type is a member type with an associated contact.
+	 *
+	 * This method determines if the object type is of type 'dimension_object' and
+	 * verifies the existence of 'contact_id' and 'contact_object_type_id' columns.
+	 *
+	 * @return bool True if the object is a member type with a contact, false otherwise.
+	 */
+	function isMemberTypeWithContact() {
+		$ot = ObjectTypes::instance()->findById($this->getObjectTypeId());
+		return $ot->getType() == 'dimension_object' && $this->columnExists('contact_id') && $this->columnExists('contact_object_type_id');
 	}
 	
 	

@@ -298,6 +298,11 @@ class MailContents extends BaseMailContents {
 
 		}
 		
+		/**
+		 * THIS CONDITION CAUSES A BIG PERFORMANCE ISSUE
+		 * ALSO IT IS REDUNDANT, AS THE PERMISSIONS ARE ALREADY CHECKED INSIDE listing() FUNCTION
+		 * AND THE ACCOUNT FILTER IS ALSO CHECKED INSIDE listing() FUNCTION
+		 * 
 		// if not filtering by account or classification then check that emails are classified or from one of my accounts
 		if ($classified=='' && $accountConditions=='') {
 			$macs = MailAccountContacts::instance()->getByContact(logged_user());
@@ -310,6 +315,7 @@ class MailContents extends BaseMailContents {
 				AND 1=(select d1.is_manageable from ".TABLE_PREFIX."dimensions d1 where d1.id=(select m1.dimension_id from ".TABLE_PREFIX."members m1 where m1.id=om1.member_id))
 			) ) ";
 		}
+		*/
 
 		// Check for draft, junk, etc. emails
 		if ($state == "draft") {
